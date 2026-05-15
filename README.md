@@ -109,6 +109,20 @@ salmon_index:       s3://YOUR_BUCKET/refs/REdiscoverTE/salmon_index
 rollup_annotation:  s3://YOUR_BUCKET/refs/REdiscoverTE/rollup_annotation
 ```
 
+If a prebuilt Salmon index is unavailable or suspected to be incomplete, omit
+`salmon_index` and provide the transcriptome FASTA instead:
+
+```yaml
+input:              s3://YOUR_BUCKET/samplesheets/run1.csv
+outdir:             s3://YOUR_BUCKET/results/run1
+transcriptome_fasta: s3://YOUR_BUCKET/refs/REdiscoverTE/REdiscoverTE_whole_transcriptome_hg38.fa
+rollup_annotation:  s3://YOUR_BUCKET/refs/REdiscoverTE/rollup_annotation
+```
+
+The runtime index build uses Salmon `--keepDuplicates`. It is useful for
+testing or repairing a bad reference copy, but it adds a large one-time task to
+the run.
+
 4. Pick the `seqera` profile. The compute environment should provide the AWS
    Batch queue and work directory. This profile uses regular AWS Batch Docker
    execution and does not require Fusion.

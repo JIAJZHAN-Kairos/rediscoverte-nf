@@ -10,17 +10,21 @@
 nextflow.enable.dsl = 2
 
 include { ORA_DECOMPRESS } from './modules/local/ora_decompress'
+include { BUILD_SALMON_INDEX } from './modules/local/build_salmon_index'
 include { SALMON_QUANT   } from './modules/local/salmon_quant'
 include { ROLLUP         } from './modules/local/rollup'
 
 // ---------- Workflow ----------
 workflow {
     // Parameter checks
-    def required = ['input', 'outdir', 'salmon_index', 'rollup_annotation']
+    def required = ['input', 'outdir', 'rollup_annotation']
     required.each { p ->
         if (!params[p]) {
             exit 1, "Missing required parameter: --${p}"
         }
+    }
+    if (!params.salmon_index && !params.transcriptome_fasta) {
+        exit 1, "Provide either --salmon_index or --transcriptome_fasta"
     }
 
     // Parse samplesheet: sample,fastq_1,fastq_2.
@@ -57,8 +61,14 @@ workflow {
 
     ch_quant_in = ch_decompressed.mix(ch_branched.ready)
 
-    // Salmon quant against prebuilt index
-    ch_index = Channel.value(file(params.salmon_index, checkIfExists: true))
+    // Salmon quant against a prebuilt index, or build one from FASTA for this run
+    if (params.salmon_index) {
+        ch_index = Channel.value(file(params.salmon_index, checkIfExists: true))
+    } else {
+        ch_fasta = Channel.value(file(params.transcriptome_fasta, checkIfExists: true))
+        BUILD_SALMON_INDEX(ch_fasta)
+        ch_index = BUILD_SALMON_INDEX.out.index
+    }
     SALMON_QUANT(ch_quant_in, ch_index)
 
     // Rollup all quant.sf via rollup.R
