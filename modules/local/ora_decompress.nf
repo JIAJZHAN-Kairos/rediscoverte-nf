@@ -18,7 +18,7 @@ process ORA_DECOMPRESS {
                 ;;
             *.fastq.gz|*.fq.gz)
                 # passthrough: link (avoid copying)
-                ln -sf "\$(readlink -f \$f)" "\$(basename \$f)"
+                ln -sf "\$(realpath \$f)" "\$(basename \$f)"
                 ;;
             *)
                 echo "Unsupported input extension: \$f" >&2

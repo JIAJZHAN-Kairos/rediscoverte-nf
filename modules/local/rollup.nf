@@ -1,7 +1,7 @@
 process ROLLUP {
     tag "rollup"
     label 'rollup'
-    publishDir "${params.outdir}", mode: 'copy'
+    publishDir "${params.outdir}", mode: params.publish_mode
 
     input:
     path quant_dirs, stageAs: 'salmon/*'

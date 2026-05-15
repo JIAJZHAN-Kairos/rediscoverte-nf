@@ -13,16 +13,15 @@ include { ORA_DECOMPRESS } from './modules/local/ora_decompress'
 include { SALMON_QUANT   } from './modules/local/salmon_quant'
 include { ROLLUP         } from './modules/local/rollup'
 
-// ---------- Parameter checks ----------
-def required = ['input', 'outdir', 'salmon_index', 'rollup_annotation']
-required.each { p ->
-    if (!params[p]) {
-        exit 1, "Missing required parameter: --${p}"
-    }
-}
-
 // ---------- Workflow ----------
 workflow {
+    // Parameter checks
+    def required = ['input', 'outdir', 'salmon_index', 'rollup_annotation']
+    required.each { p ->
+        if (!params[p]) {
+            exit 1, "Missing required parameter: --${p}"
+        }
+    }
 
     // Parse samplesheet: sample,fastq_1,fastq_2
     ch_samples = Channel
@@ -54,8 +53,4 @@ workflow {
     // Rollup all quant.sf via rollup.R
     ch_anno = Channel.value(file(params.rollup_annotation, checkIfExists: true))
     ROLLUP(SALMON_QUANT.out.quant_dir.collect(), ch_anno)
-}
-
-workflow.onComplete {
-    log.info "Pipeline ${workflow.success ? 'succeeded' : 'FAILED'}: ${workflow.duration}"
 }

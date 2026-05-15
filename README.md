@@ -56,16 +56,17 @@ Two custom images plus one off-the-shelf Salmon container.
 ```bash
 # orad (Illumina DRAGEN ORA decompression v2.7.0; ~1.5 GB image)
 cd containers/orad
-docker build -t ghcr.io/JIAJZHAN-Kairos/rediscoverte-orad:2.7.0 .
-docker push    ghcr.io/JIAJZHAN-Kairos/rediscoverte-orad:2.7.0
+docker build -t ghcr.io/jiajzhan-kairos/rediscoverte-orad:2.7.0 .
+docker push    ghcr.io/jiajzhan-kairos/rediscoverte-orad:2.7.0
 
 # rollup (R + edgeR + rollup.R)
 cd ../rollup
-docker build -t ghcr.io/JIAJZHAN-Kairos/rediscoverte-rollup:1.0 .
-docker push    ghcr.io/JIAJZHAN-Kairos/rediscoverte-rollup:1.0
+docker build -t ghcr.io/jiajzhan-kairos/rediscoverte-rollup:1.0 .
+docker push    ghcr.io/jiajzhan-kairos/rediscoverte-rollup:1.0
 ```
 
-Replace `JIAJZHAN-Kairos` in `nextflow.config` to match your pushed image tags.
+If you push images under a different GHCR namespace, override
+`--orad_container` and `--rollup_container` at launch.
 
 Salmon container is bioconda's: `quay.io/biocontainers/salmon:1.10.3--h6dccd9a_2` — no build needed.
 
@@ -105,7 +106,12 @@ salmon_index:       s3://YOUR_BUCKET/refs/REdiscoverTE/salmon_index
 rollup_annotation:  s3://YOUR_BUCKET/refs/REdiscoverTE/rollup_annotation
 ```
 
-4. Pick the `awsbatch` profile (or set your compute env in Seqera).
+4. Pick the `seqera` profile. The compute environment should provide the AWS
+   Batch queue and work directory.
+
+For `.fastq.ora` input, use the same samplesheet schema as `.fastq.gz`; the
+pipeline automatically routes `.ora` reads through `ORA_DECOMPRESS` before
+Salmon.
 
 ## Outputs
 

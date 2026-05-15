@@ -1,7 +1,7 @@
 process SALMON_QUANT {
     tag "${meta.id}"
     label 'salmon'
-    publishDir "${params.outdir}/salmon", mode: 'copy'
+    publishDir "${params.outdir}/salmon", mode: params.publish_mode
 
     input:
     tuple val(meta), path(reads)
