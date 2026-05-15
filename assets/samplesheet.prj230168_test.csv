@@ -1,0 +1,2 @@
+sample,fastq_1,fastq_2
+PRJ230168_L2300362_rerun,s3://research-data-550435500918-ap-southeast-2/byob-icav2/project-cancer-atlas-research/primary/230406_A00130_0253_BH5JJLDSX7/20241122881f5786/WTS_NebRNA/PRJ230168_L2300362_rerun_S1_L004_R1_001.fastq.ora,s3://research-data-550435500918-ap-southeast-2/byob-icav2/project-cancer-atlas-research/primary/230406_A00130_0253_BH5JJLDSX7/20241122881f5786/WTS_NebRNA/PRJ230168_L2300362_rerun_S1_L004_R2_001.fastq.ora
