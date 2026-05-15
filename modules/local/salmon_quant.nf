@@ -13,7 +13,9 @@ process SALMON_QUANT {
     tuple val(meta), path("${meta.id}/lib_format_counts.json"), emit: libstats, optional: true
 
     script:
-    def reads_arg = meta.single_end ? "-r ${reads}" : "-1 ${reads[0]} -2 ${reads[1]}"
+    def reads_arg = meta.single_end ?
+        "-r ${reads.join(' ')}" :
+        "-1 ${reads.findAll { it.name =~ /(_R1_|_1[.]|_1$)/ }.join(' ')} -2 ${reads.findAll { it.name =~ /(_R2_|_2[.]|_2$)/ }.join(' ')}"
     """
     salmon quant \\
         --seqBias \\

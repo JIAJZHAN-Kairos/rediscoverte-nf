@@ -23,7 +23,9 @@ workflow {
         }
     }
 
-    // Parse samplesheet: sample,fastq_1,fastq_2
+    // Parse samplesheet: sample,fastq_1,fastq_2.
+    // Multiple rows with the same sample are treated as separate lanes/read groups
+    // and are quantified together by Salmon.
     ch_samples = Channel
         .fromPath(params.input, checkIfExists: true)
         .splitCsv(header: true)
@@ -32,7 +34,16 @@ workflow {
             def f1 = file(row.fastq_1, checkIfExists: true)
             def f2 = (row.fastq_2 && row.fastq_2.trim()) ? file(row.fastq_2, checkIfExists: true) : null
             meta.single_end = (f2 == null)
-            def reads = f2 ? [f1, f2] : [f1]
+            tuple(row.sample, meta.single_end, f2 ? [[f1, f2]] : [[f1]])
+        }
+        .groupTuple()
+        .map { sample, single_end_values, reads_nested ->
+            def single_end_set = single_end_values.unique()
+            if (single_end_set.size() != 1) {
+                exit 1, "Sample ${sample} mixes single-end and paired-end rows"
+            }
+            def meta = [id: sample, single_end: single_end_set[0]]
+            def reads = reads_nested.flatten()
             tuple(meta, reads)
         }
 

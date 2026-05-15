@@ -80,6 +80,9 @@ Salmon container is bioconda's: `quay.io/biocontainers/salmon:1.10.3--h6dccd9a_2
 
 See `assets/samplesheet.example.csv`.
 
+Use multiple rows with the same `sample` for multi-lane or rerun libraries;
+the pipeline quantifies all rows for that sample together in one Salmon call.
+
 ## Run
 
 ### Locally (smoke test with Docker)
