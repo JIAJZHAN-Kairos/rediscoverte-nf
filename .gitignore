@@ -1,0 +1,20 @@
+# Nextflow
+work/
+.nextflow*
+*.log
+
+# Results
+results/
+test_results/
+
+# OS
+.DS_Store
+*.swp
+
+# Local data
+*.bam
+*.fastq.gz
+*.fastq.ora
+*.fa
+*.fa.gz
+*.fa.xz
