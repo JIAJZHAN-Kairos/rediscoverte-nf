@@ -107,7 +107,8 @@ rollup_annotation:  s3://YOUR_BUCKET/refs/REdiscoverTE/rollup_annotation
 ```
 
 4. Pick the `seqera` profile. The compute environment should provide the AWS
-   Batch queue and work directory.
+   Batch queue and work directory. This profile uses regular AWS Batch Docker
+   execution and does not require Fusion.
 
 For `.fastq.ora` input, use the same samplesheet schema as `.fastq.gz`; the
 pipeline automatically routes `.ora` reads through `ORA_DECOMPRESS` before
