@@ -108,7 +108,9 @@ rollup_and_return <- function(filepaths.vec, outdir, sample_ids.vec, columns, ou
           dat.summary <- list()
           for (single_column_name in columns) {
                stopifnot(single_column_name %in% colnames(dat.annot))
-               m.tib = merged.top %>% group_by_(.dots=single_column_name) %>% summarize(NumReads=sum(NumReads, na.rm=T), TPM=sum(TPM, na.rm=T))
+               m.tib = merged.top %>%
+                    group_by(across(all_of(single_column_name))) %>%
+                    summarize(NumReads=sum(NumReads, na.rm=T), TPM=sum(TPM, na.rm=T), .groups="drop")
                m.mat = m.tib %>% select(-1) %>% base::as.matrix() %>% `rownames<-`( m.tib %>% pull(1) )
                dat.summary[[single_column_name]] <- m.mat
           }
