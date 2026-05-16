@@ -73,5 +73,6 @@ workflow {
 
     // Rollup all quant.sf via rollup.R
     ch_anno = Channel.value(file(params.rollup_annotation, checkIfExists: true))
-    ROLLUP(SALMON_QUANT.out.quant_dir.collect(), ch_anno)
+    ch_quant_dirs = SALMON_QUANT.out.quant_dir.map { meta, quant_dir -> quant_dir }.collect()
+    ROLLUP(ch_quant_dirs, ch_anno)
 }
