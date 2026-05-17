@@ -61,8 +61,8 @@ docker push    ghcr.io/jiajzhan-kairos/rediscoverte-orad:2.7.0
 
 # rollup (R + edgeR + rollup.R)
 cd ../rollup
-docker build -t ghcr.io/jiajzhan-kairos/rediscoverte-rollup:1.1 .
-docker push    ghcr.io/jiajzhan-kairos/rediscoverte-rollup:1.1
+docker build -t ghcr.io/jiajzhan-kairos/rediscoverte-rollup:1.2 .
+docker push    ghcr.io/jiajzhan-kairos/rediscoverte-rollup:1.2
 ```
 
 If you push images under a different GHCR namespace, override

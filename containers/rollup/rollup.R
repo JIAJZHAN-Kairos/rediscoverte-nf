@@ -72,20 +72,15 @@ read_rds_or_table <- function(path, required_cols=c(), ...) {
 
 #' load_salmon_quant_sf
 #' 
-#' Generates a three-column tibble from a 'quant.sf' file (which is the output of the aligner 'Salmon'). Note: this function is 'memoized'--it will only read the same filename from disk a single time. It then saves the results into GLOBAL_MEMOIZED_QUANT_SF_DATA.
+#' Generates a three-column tibble from a 'quant.sf' file (which is the output of the aligner 'Salmon').
 #' @param filename: The salmon quant.sf file. Also can be quant.sf.gz (or any other compressed format that 'readr' can handle).
 #' @return A tibble with the 'Name', 'TPM', and 'EffectiveLength' columns from the specified quant.sf. The "Length" and "EffectiveLength" columns are omitted.
 load_salmon_quant_sf <- function(filename) { # Can read a quant.sf file or a quant.sf.gz file.
      mandate(is.character(filename) && grepl("[.]sf", filename, perl=T, ignore.case=T), paste0("Warning: 'quant.sf' file did not have '.sf' anywhere in the name. The filename in question was --> ", filename))
-     if (filename %in% names(GLOBAL_MEMOIZED_QUANT_SF_DATA)) {
-          qsf.tib <- GLOBAL_MEMOIZED_QUANT_SF_DATA[[filename]]
-     } else {
-          qsf.tib <- readr::read_tsv(filename, col_types="cdddd") # col_types="cdddd" means: "character", "double"x4 (Name, Length, Effectivelength, TPM, NumReads)
-          mandate(ncol(qsf.tib)==5, paste0("Error: input quant.sf file did not have the expected 5 columns. Instead it had the following column names: ", paste0(colnames(qsf.tib), collapse=", ")))
-          mandate(all(colnames(qsf.tib)[4:5] == c("TPM", "NumReads")), paste0("Input quant.sf file lacked a 'TPM' column 4 and 'NumReads' column 5. Those exact column headers are required for a valid salmon 'quant.sf' file. Instead, we found these columns: ", paste0(colnames(qsf.tib), collapse=", ")))
-          qsf.tib <- qsf.tib %>% select(-matches("^(Length|EffectiveLength)$")) # get rid of Length and EffectiveLength
-          GLOBAL_MEMOIZED_QUANT_SF_DATA[[filename]] <<- qsf.tib # "memoize" (save this quant.sf so we don't have to read it from disk again)
-     }
+     qsf.tib <- readr::read_tsv(filename, col_types="cdddd") # col_types="cdddd" means: "character", "double"x4 (Name, Length, Effectivelength, TPM, NumReads)
+     mandate(ncol(qsf.tib)==5, paste0("Error: input quant.sf file did not have the expected 5 columns. Instead it had the following column names: ", paste0(colnames(qsf.tib), collapse=", ")))
+     mandate(all(colnames(qsf.tib)[4:5] == c("TPM", "NumReads")), paste0("Input quant.sf file lacked a 'TPM' column 4 and 'NumReads' column 5. Those exact column headers are required for a valid salmon 'quant.sf' file. Instead, we found these columns: ", paste0(colnames(qsf.tib), collapse=", ")))
+     qsf.tib <- qsf.tib %>% select(-matches("^(Length|EffectiveLength)$")) # get rid of Length and EffectiveLength
      stopifnot(colnames(qsf.tib) == c("Name","TPM","NumReads"))
      return(qsf.tib) # <-- 3-column tibble (Name, TPM, NumReads). We discard 'Length' and 'EffectiveLength'.
 }
@@ -221,7 +216,6 @@ mandate(file.exists(opt$metadata_tsv), paste0("Could not read a metadata file at
 mandate(!is.null(opt$assembly) && (opt$assembly %in% c("hg38")), paste0("Invalid assembly. Currently, we only accept 'hg38'. Your specified assembly was: ", as.character(opt$assembly)))
 if (!dir.exists(opt$outdir)) { dir.create(opt$outdir); }
 
-GLOBAL_MEMOIZED_QUANT_SF_DATA <- list() # Data structure used to 'memoize' (save for later) 'quant.sf' data to avoid multiple reads.
 ALL_RE_LEVELS           <- c("repName", "repFamily", "repClass") # Hierarchical categories of repetitive element classifiction, from most specific (repName) to most general (repClass). Must be in this order.
 METADATA_SAMPLE_COLNAME <- "sample"        # <-- usually the 1st column in the metadata.tsv. A human-readable sample identifier (e.g. 'TreatmentA').
 METADATA_QUANTSF_COL    <- "quant_sf_path" # <-- usually the 2nd column in the metadata.tsv. Should be full paths to each quant.sf file (e.g. /file/path/to/TreatmentA/quant.sf.gz).
