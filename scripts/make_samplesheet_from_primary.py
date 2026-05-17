@@ -17,12 +17,12 @@ from pathlib import Path
 
 READ_RE = re.compile(r"^(?P<sample>.+)_R(?P<read>[12])_001\.fastq\.ora$")
 LANE_SUFFIX_RE = re.compile(r"_S\d+_L\d{3}$")
-RERUN_SUFFIX_RE = re.compile(r"_rerun\d*$")
+EXTRA_RUN_SUFFIX_RE = re.compile(r"_(rerun|topup)\d*$")
 
 
 def sample_from_pair_key(pair_key: str) -> str:
     sample = LANE_SUFFIX_RE.sub("", pair_key)
-    return RERUN_SUFFIX_RE.sub("", sample)
+    return EXTRA_RUN_SUFFIX_RE.sub("", sample)
 
 
 def mounted_path_to_s3(path: Path, mount_root: Path, bucket: str) -> str:
